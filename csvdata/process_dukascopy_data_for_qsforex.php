@@ -123,11 +123,14 @@ for($i = $starttime; $i < $endtime; $i += 3600) {
         }
     }
     if (strcasecmp($hour, '00') == 0) {
-        $outfd = fopen($pair . "_" . $year . $monthqsf . $day . ".csv",'w');
+        $filename = $pair . "_" . $year . $monthqsf . $day . ".csv";
+        $outfd = fopen($filename,'w');
         if ($outfd === FALSE) {
             echo "Cannot open $outfile for writing.\n";
             exit(1);
         }
+        fwrite($outfd,"Time,Ask,Bid,AskVolume,BidVolume\n");
+        $start_ftell = ftell($outfd);
     }
     if (filesize($localfile) > 0) {
         if ($bin) {
@@ -141,7 +144,12 @@ for($i = $starttime; $i < $endtime; $i += 3600) {
         echo "Warning: 0 sized $localfile\n";
     }
     if (strcasecmp($hour, '23') == 0) {
-        fclose($outfd);
+        if (ftell($outfd) == $start_ftell) { /* Only header - delete empty file */
+            fclose($outfd);
+            unlink($filename);
+        }
+        else
+            fclose($outfd);
     }    
 }
 rmdir($tmpdir);
