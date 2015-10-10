@@ -249,19 +249,19 @@ function decode_ducascopy_bi5($fname, $outfd, $hourtimestamp) {
         $timesec = $hourtimestamp + $deltat / 1000;
         $timems = $deltat % 1000;
 
-
+        // Bids and asks swapped by Angus - seemed to be wrong way round (bid>ask) and swapped relative to manually downloaded Dukascopy file
         $q = unpack('@'.($idx + 4)."/N", $bin);
-        $ask = $q[1] * $point;
-        $q = unpack('@'.($idx + 8)."/N", $bin);
         $bid = $q[1] * $point;
+        $q = unpack('@'.($idx + 8)."/N", $bin);
+        $ask = $q[1] * $point;
         $q = unpack('@'.($idx + 12)."/C4", $bin);
         $s = pack('C4', $q[4], $q[3], $q[2], $q[1]);
         $q = unpack('f', $s);
-        $askvol = $q[1];
+        $bidvol = $q[1];
         $q = unpack('@'.($idx + 16)."/C4", $bin);
         $s = pack('C4', $q[4], $q[3], $q[2], $q[1]);
         $q = unpack('f', $s);
-        $bidvol = $q[1];
+        $askvol = $q[1];
 
         if ($bid == intval($bid)) {
             $bid = number_format($bid, 1, '.', '');
